@@ -1,5 +1,5 @@
 ''' first, I imported this Flask class from the Flask library. '''
-from flask import Flask
+from flask import Flask , render_template, request, redirect, url_for
 ''' next, I create an instance of this class with the name
 of running application. Anytime we run an application in Python,
 a special variable called name gets defined for the application
@@ -30,6 +30,9 @@ def restaurantMenu(restaurant_id):
 	restaurant = session.query(Restaurant).filter_by(id=restaurant_id).one()
 	''' list of all itens of menu and stored in a string called output '''
 	items = session.query(MenuItem).filter_by(restaurant_id=restaurant.id)
+	return render_template('menu.html', restaurant=restaurant, items=items)
+
+	'''
 	output = ''
 	for i in items:
 		output += i.name
@@ -39,27 +42,32 @@ def restaurantMenu(restaurant_id):
 		output += i.description	
 		output += '</br>'
 		output += '</br>'
-	''' return the string for user could see the items of restaurant'''
+	#return the string for user could see the items of restaurant
 	return output
-
+	'''
 # Task 1: Create route for newMenuItem function here
 
-
+@app.route('/restaurants/<int:restaurant_id>/new/', methods=['GET','POST'])
 def newMenuItem(restaurant_id):
-    return "page to create a new menu item. Task 1 complete!"
+	if request.method == 'POST':
+		newItem = MenuItem(name = request.form['name'], restaurant_id = restaurant_id)
+		session.add(newItem)
+		session.commit()
+		return redirect(url_for('restaurantMenu', restaurant_id = restaurant_id))
+	else:
+		return render_template('newmenuitem.html', restaurant_id = restaurant_id)
 
 # Task 2: Create route for editMenuItem function here
 
-
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/edit/')
 def editMenuItem(restaurant_id, menu_id):
     return "page to edit a menu item. Task 2 complete!"
 
 # Task 3: Create a route for deleteMenuItem function here
 
-
-
-
-
+@app.route('/restaurants/<int:restaurant_id>/<int:menu_id>/delete/')
+def deleteMenuItem(restaurant_id, menu_id):
+    return "page to delete a menu item. Task 3 complete!"
 
 ''' the application run by the Python interpreter gets a name
 variable set to __main__.
